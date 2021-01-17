@@ -13,8 +13,8 @@ pygame.display.set_caption("Sudoku Solver")
 # img = pygame.image.load('icon.png')
 # pygame.display.set_icon(img)
 
-
-grid = Solver.test_grid
+Ggrid = Solver.g
+grid = Ggrid.grid
 
 x = 0
 y = 0
@@ -44,11 +44,12 @@ def draw():
     for i in range(9):
         for j in range(9):
             if grid[i][j] != 0:
-                color1 = (0, 153, 153)
-                color2 = (0, 140, 140)
-                # Fill blue color in already numbered grid
                 if (i,j) in Solver.g.defaults:
-                    pygame.draw.rect(screen, (0, 153, 153), (i * dif, j * dif, dif + 1, dif + 1))
+                        color = (170, 160, 190)
+                else:
+                    color = (120, 130, 200)
+                # Fill blue color in already numbered grid
+                pygame.draw.rect(screen, color, (i * dif, j * dif, dif + 1, dif + 1))
 
                 # Fill grid with default numbers specified
                 text1 = font1.render(str(grid[i][j]), 1, (0, 0, 0))
@@ -142,7 +143,8 @@ while run:
                 val = 9
             if event.key == pygame.K_DELETE or event.key == pygame.K_BACKSPACE:
                 val = -1
-            # if event.key == pygame.K_RETURN:
+            if event.key == pygame.K_SPACE:
+                print("hello")
             #     flag2 = 1
             # If R pressed clear the sudoku board
             if event.key == pygame.K_r:
@@ -165,40 +167,32 @@ while run:
                 rs = 0
                 error = 0
                 flag2 = 0
-                grid =[
-                    [7, 8, 0, 4, 0, 0, 1, 2, 0],
-                    [6, 0, 0, 0, 7, 5, 0, 0, 9],
-                    [0, 0, 0, 6, 0, 1, 0, 7, 8],
-                    [0, 0, 7, 0, 4, 0, 2, 6, 0],
-                    [0, 0, 1, 0, 5, 0, 9, 3, 0],
-                    [9, 0, 4, 0, 6, 0, 0, 0, 5],
-                    [0, 7, 0, 3, 0, 0, 0, 1, 2],
-                    [1, 2, 0, 0, 0, 7, 4, 0, 0],
-                    [0, 4, 9, 2, 0, 6, 0, 0, 7]
-                ]
+                Ggrid.restoreDefault()
+                grid = Ggrid.grid
+
     if flag2 == 1:
         if solve(grid, 0, 0)== False:
             error = 1
         else:
             rs = 1
         flag2 = 0
-    if val == -1:
-        if (int(x),int(y)) not in Solver.g.defaults:
+
+    if (int(x),int(y)) not in Solver.g.defaults:
+        if val == -1:
             draw_val(0)
-            grid[int(x)][int(y)]= 0
-        val = 0
-    elif val != 0:
-        draw_val(val)
-        grid[int(x)][int(y)]= val
-        # print(x)
-        # print(y)
-        # if valid(grid, int(x), int(y), val)== True:
-        #     grid[int(x)][int(y)]= val
-        #     flag1 = 0
-        # else:
-        #     grid[int(x)][int(y)]= 0
-        #     raise_error2()
-        val = 0
+            Ggrid.put(0,int(x),int(y))
+        elif val != 0:
+
+            # print(x)
+            # print(y)
+            if Ggrid.check(val, int(x), int(y)):
+                draw_val(val)
+                Ggrid.put(val,int(x),int(y))
+                flag1 = 0
+            else:
+                Ggrid.put(0,int(x),int(y))
+                raise_error2()
+    val = 0
 
     if error == 1:
         raise_error1()
